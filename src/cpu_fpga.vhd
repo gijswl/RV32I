@@ -30,7 +30,7 @@ architecture RTL of cpu_fpga is
 	signal C_WDT : std_logic_vector(31 downto 0);
 	signal C_RDT : std_logic_vector(31 downto 0);
 
-	component ram_sim
+	component ram
 		port(
 			I_CLK  : in  std_logic;
 			I_ADDR : in  std_logic_vector(31 downto 0);
@@ -62,7 +62,7 @@ begin
 			Q_WDT => R_DATO
 		);
 
-	ram_t : ram_sim
+	ram_t : ram
 		port map(
 			I_CLK  => L_CLK,
 			I_ADDR => R_ADDR,
