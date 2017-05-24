@@ -1,0 +1,55 @@
+v 3
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/ar_logic.vhd" "20170305082342.000" "20170305092604.610":
+  entity ar_logic at 1( 0) + 0 on 11099;
+  architecture rtl of ar_logic at 19( 402) + 0 on 11100;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/ifetch_unit.vhd" "20170305082302.000" "20170305092604.613":
+  entity ifetch_unit at 1( 0) + 0 on 11111;
+  architecture rtl of ifetch_unit at 23( 600) + 0 on 11112;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/bus_interface.vhd" "20170302092014.000" "20170305092604.610":
+  entity bus_interface at 1( 0) + 0 on 11101;
+  architecture rtl of bus_interface at 26( 703) + 0 on 11102;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "test/ram.vhd" "20170305082600.000" "20170305092604.608":
+  entity ram at 1( 0) + 0 on 11095;
+  architecture rtl of ram at 17( 362) + 0 on 11096;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/cpu_core.vhd" "20170303095518.000" "20170305092604.612":
+  entity cpu_core at 1( 0) + 0 on 11105;
+  architecture rtl of cpu_core at 17( 384) + 0 on 11106;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/random_control_logic.vhd" "20170304082814.000" "20170305092604.615":
+  entity random_control_logic at 1( 0) + 0 on 11121;
+  architecture rtl of random_control_logic at 30( 934) + 0 on 11122;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/ifunc_decoder.vhd" "20170303082008.000" "20170305092604.614":
+  entity ifunc_decoder at 1( 0) + 0 on 11115;
+  architecture rtl of ifunc_decoder at 14( 323) + 0 on 11116;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/cycle_gen.vhd" "20170227123130.000" "20170305092604.612":
+  entity cycle_gen at 1( 0) + 0 on 11109;
+  architecture rtl of cycle_gen at 15( 301) + 0 on 11110;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/itype_decoder.vhd" "20170228155338.000" "20170305092604.614":
+  entity itype_decoder at 1( 0) + 0 on 11117;
+  architecture rtl of itype_decoder at 11( 208) + 0 on 11118;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/iformat_decoder.vhd" "20170228155356.000" "20170305092604.613":
+  entity iformat_decoder at 1( 0) + 0 on 11113;
+  architecture rtl of iformat_decoder at 13( 279) + 0 on 11114;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/control_unit.vhd" "20170303094948.000" "20170305092604.611":
+  entity control_unit at 1( 0) + 0 on 11103;
+  architecture rtl of control_unit at 28( 800) + 0 on 11104;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/registerfile.vhd" "20170304085830.000" "20170305092604.617":
+  entity registerfile at 1( 0) + 0 on 11125;
+  architecture rtl of registerfile at 17( 391) + 0 on 11126;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/reg32.vhd" "20170217165034.000" "20170305092604.616":
+  entity reg32 at 1( 0) + 0 on 11123;
+  architecture rtl of reg32 at 18( 361) + 0 on 11124;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/alu.vhd" "20170303162006.000" "20170305092604.609":
+  entity alu at 1( 0) + 0 on 11097;
+  architecture rtl of alu at 17( 421) + 0 on 11098;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "test/testbench.vhd" "20170303143758.000" "20170305092604.607":
+  entity testbench at 1( 0) + 0 on 11093;
+  architecture rtl of testbench at 8( 120) + 0 on 11094;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/cpu_fpga.vhd" "20170302150402.000" "20170305092604.612":
+  entity cpu_fpga at 1( 0) + 0 on 11107;
+  architecture rtl of cpu_fpga at 12( 197) + 0 on 11108;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/pc_logic.vhd" "20170305082400.000" "20170305092604.615":
+  entity pc_logic at 1( 0) + 0 on 11119;
+  architecture rtl of pc_logic at 19( 402) + 0 on 11120;
+file "C:\Users\Gijs\workspaceSigasi\RV32I\" "src/shift_reg64.vhd" "20170304120626.000" "20170305092604.618":
+  entity shift_reg64 at 1( 0) + 0 on 11127;
+  architecture rtl of shift_reg64 at 18( 436) + 0 on 11128;
