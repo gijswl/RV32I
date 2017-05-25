@@ -1,5 +1,6 @@
 library ieee;
 use ieee.std_logic_1164.all;
+use ieee.std_logic_unsigned.all;
 use ieee.numeric_std.all;
 
 entity ifetch_unit is
@@ -74,7 +75,7 @@ architecture RTL of ifetch_unit is
 	signal A_INC_4 : std_logic                     := '0';
 	signal A_AR    : std_logic_vector(31 downto 0) := X"00000000";
 
-	signal L_T     : std_logic_vector(1 downto 0)  := "00";
+	signal L_T     : std_logic_vector(2 downto 0)  := "000";
 	signal L_WR    : std_logic                     := '0';
 	signal L_UDR   : std_logic                     := '0';
 	signal L_ADS   : std_logic                     := '1';
@@ -120,7 +121,7 @@ begin
 	process(I_CLK)
 	begin
 		if (falling_edge(I_CLK)) then
-			if (L_T = "00") then
+			if (L_T = "000") then
 				L_DATA  <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 				L_UDR   <= '0';
 				S_D     <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
@@ -130,18 +131,22 @@ begin
 					L_ADR <= I_ADR;
 					L_WR  <= '0';
 					L_ADS <= '0';
-					L_T   <= "10";
+					if (I_ADR(1 downto 0) = "00") then
+						L_T <= "010";
+					else
+						L_T <= "110";
+					end if;
 				elsif ((S_AMT = "00" or S_AMT = "01") and not S_W = '1') then
 					L_ADR <= A_AR;
 					L_WR  <= '0';
 					L_ADS <= '0';
-					L_T   <= "01";
+					L_T   <= "001";
 				end if;
-			elsif (L_T = "01" or L_T = "10") then
+			elsif (L_T = "001" or L_T = "010") then
 				L_ADS <= '1';
 				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 				if (I_RDY = '0') then
-					if (L_T = "10") then
+					if (L_T = "010") then
 						L_DATA <= I_DATA;
 						L_UDR  <= '1';
 					else
@@ -149,7 +154,33 @@ begin
 						S_D     <= I_DATA;
 						S_W     <= '1';
 					end if;
-					L_T <= "00";
+					L_T <= "000";
+				end if;
+			elsif (L_T = "110") then
+				L_ADS <= '1';
+				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+				if (I_RDY = '0') then
+					L_DAT <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
+
+					L_ADR <= I_ADR + "100";
+					L_WR  <= '0';
+					L_ADS <= '0';
+					L_T   <= "111";
+				end if;
+			elsif (L_T = "111") then
+				L_ADS <= '1';
+				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+
+				if (I_RDY = '0') then
+					if (I_ADR(1 downto 0) = "01") then
+						L_DATA <= L_DAT or SHL(I_DATA, "11000");
+					elsif (I_ADR(1 downto 0) = "11") then
+						L_DATA <= L_DAT or SHL(I_DATA, "10000");
+					elsif (I_ADR(1 downto 0) = "11") then
+						L_DATA <= L_DAT or SHL(I_DATA, "01000");
+					end if;
+					L_UDR <= '1';
+					L_T   <= "000";
 				end if;
 			end if;
 		end if;
@@ -161,9 +192,7 @@ begin
 	with I_SL select Q_DATA <=          --
 		(31 downto 8 => L_DATA(7)) & L_DATA(7 downto 0) when "1000",
 		(31 downto 16 => L_DATA(15)) & L_DATA(15 downto 0) when "1001",
-		L_DATA when "1010",
-		(31 downto 8 => '0') & L_DATA(7 downto 0) when "1100",
-		(31 downto 16 => '0') & L_DATA(15 downto 0) when "1101",
+		L_DATA when "1010",(31 downto 8 => '0') & L_DATA(7 downto 0) when "1100",(31 downto 16 => '0') & L_DATA(15 downto 0) when "1101",
 		X"00000000" when others;
 
 	Q_ADS   <= L_ADS;
