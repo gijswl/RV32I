@@ -77,7 +77,7 @@ begin
 				I_INSTR(19 downto 15) when ((I_CYCLE(3) = '1' and I_TYPE(25) = '1') 
 										or (I_CYCLE(0) = '1' and (I_TYPE(0) = '1' or I_TYPE(4) = '1' or I_TYPE(12) = '1' or I_TYPE(24) = '1' or L_CSRSC = '1'))) else 
 				I_INSTR(11 downto 7) when ((I_CYCLE(3) = '1' and (I_TYPE(5) = '1' or I_TYPE(12) = '1')) 
-										or (I_CYCLE(2) = '1' and (I_TYPE(0) = '1' or I_TYPE(4) = '1' or I_TYPE(5) = '1' or I_TYPE(13) = '1' or I_TYPE(25) = '1' or I_TYPE(27) = '1' or L_CSRW = '1'))) 
+										or (I_CYCLE(2) = '1' and (I_TYPE(0) = '1' or I_TYPE(4) = '1' or I_TYPE(5) = '1' or I_TYPE(13) = '1' or I_TYPE(25) = '1' or I_TYPE(27) = '1' or L_CSRW = '1' or L_CSRSC = '1'))) 
 				else "00000";
 					
 	L_RST <= (I_CYCLE(2) and ( I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or (not L_BT and I_TYPE(24)))) 
