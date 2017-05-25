@@ -176,15 +176,15 @@ begin
 			I_IN  => L_BUSC,
 			Q_OUT => R_OUT
 		);
---	cf : csrfile
---		port map(
---			I_CLK => I_CLK,
---			I_WE  => '0',
---			I_OE  => '1',
---			I_ADR => C_IMM(11 downto 0),
---			I_IN  => L_BUSC,
---			Q_OUT => S_OUT
---		);
+	cf : csrfile
+		port map(
+			I_CLK => I_CLK,
+			I_WE  => C_BUSCSR,
+			I_OE  => C_CSRBUS,
+			I_ADR => C_IMM(11 downto 0),
+			I_IN  => L_BUSC,
+			Q_OUT => S_OUT
+		);
 	ifu : ifetch_unit
 		port map(
 			I_CLK   => I_CLK,

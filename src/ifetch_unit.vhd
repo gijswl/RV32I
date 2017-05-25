@@ -34,14 +34,14 @@ architecture RTL of ifetch_unit is
 			I_W      : in  std_logic;
 			I_RST    : in  std_logic;
 			I_SHIFT1 : in  std_logic;
-			Q_AMT    : out std_logic_vector(1 downto 0);
+			Q_AMT    : out std_logic_vector(2 downto 0);
 			Q_D      : out std_logic_vector(31 downto 0)
 		);
 	end component shift_reg64;
 
 	signal S_W   : std_logic                     := '0';
 	signal S_SH1 : std_logic                     := '0';
-	signal S_AMT : std_logic_vector(1 downto 0)  := "00";
+	signal S_AMT : std_logic_vector(2 downto 0)  := "000";
 	signal S_D   : std_logic_vector(31 downto 0) := X"00000000";
 
 	component pc_logic is
@@ -79,7 +79,6 @@ architecture RTL of ifetch_unit is
 	signal L_WR    : std_logic                     := '0';
 	signal L_UDR   : std_logic                     := '0';
 	signal L_ADS   : std_logic                     := '1';
-	signal L_STALL : std_logic                     := '1';
 	signal L_ADR   : std_logic_vector(31 downto 0) := X"00000000";
 	signal L_DATA  : std_logic_vector(31 downto 0) := X"00000000";
 	signal L_DAT   : std_logic_vector(31 downto 0) := X"00000000";
@@ -136,7 +135,7 @@ begin
 					else
 						L_T <= "110";
 					end if;
-				elsif ((S_AMT = "00" or S_AMT = "01") and not S_W = '1') then
+				elsif ((S_AMT = "000" or S_AMT = "001" or S_AMT = "010") and not S_W = '1') then
 					L_ADR <= A_AR;
 					L_WR  <= '0';
 					L_ADS <= '0';
@@ -174,7 +173,7 @@ begin
 				if (I_RDY = '0') then
 					if (I_ADR(1 downto 0) = "01") then
 						L_DATA <= L_DAT or SHL(I_DATA, "11000");
-					elsif (I_ADR(1 downto 0) = "11") then
+					elsif (I_ADR(1 downto 0) = "10") then
 						L_DATA <= L_DAT or SHL(I_DATA, "10000");
 					elsif (I_ADR(1 downto 0) = "11") then
 						L_DATA <= L_DAT or SHL(I_DATA, "01000");
@@ -186,7 +185,7 @@ begin
 		end if;
 	end process;
 
-	S_SH1    <= '1' when (not (S_AMT = "00") and I_RDIR = '1') else '0';
+	S_SH1    <= '1' when (not (S_AMT = "000") and I_RDIR = '1') else '0';
 	PC_INC_4 <= I_INC_4;
 
 	with I_SL select Q_DATA <=          --
@@ -197,6 +196,6 @@ begin
 
 	Q_ADS   <= L_ADS;
 	Q_WR    <= L_WR;
-	Q_STALL <= '0' when ((S_AMT = "00" and I_RDIR = '1') or (I_SL(3) = '1' and L_UDR = '0')) else '1';
+	Q_STALL <= '0' when ((S_AMT = "000" and I_RDIR = '1') or (I_SL(3) = '1' and L_UDR = '0')) else '1';
 	Q_ADR   <= L_ADR;
 end architecture RTL;
