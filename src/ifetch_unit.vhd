@@ -10,7 +10,7 @@ entity ifetch_unit is
 		I_LDPC  : in  std_logic;
 		I_RDIR  : in  std_logic;
 		I_RDY   : in  std_logic;
-		I_SL    : in  std_logic_vector(3 downto 0);
+		I_SL    : in  std_logic_vector(4 downto 0);
 		I_PC    : in  std_logic_vector(31 downto 0);
 		I_DATA  : in  std_logic_vector(31 downto 0);
 		I_ADR   : in  std_logic_vector(31 downto 0);
@@ -75,13 +75,13 @@ architecture RTL of ifetch_unit is
 	signal A_INC_4 : std_logic                     := '0';
 	signal A_AR    : std_logic_vector(31 downto 0) := X"00000000";
 
-	signal L_T     : std_logic_vector(2 downto 0)  := "000";
-	signal L_WR    : std_logic                     := '0';
-	signal L_UDR   : std_logic                     := '0';
-	signal L_ADS   : std_logic                     := '1';
-	signal L_ADR   : std_logic_vector(31 downto 0) := X"00000000";
-	signal L_DATA  : std_logic_vector(31 downto 0) := X"00000000";
-	signal L_DAT   : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_T    : std_logic_vector(2 downto 0)  := "000";
+	signal L_WR   : std_logic                     := '0';
+	signal L_UDR  : std_logic                     := '0';
+	signal L_ADS  : std_logic                     := '1';
+	signal L_ADR  : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_DATA : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_DAT  : std_logic_vector(31 downto 0) := X"00000000";
 begin
 	ir : shift_reg64
 		port map(
@@ -130,7 +130,17 @@ begin
 					L_ADR <= I_ADR;
 					L_WR  <= '0';
 					L_ADS <= '0';
-					if (I_ADR(1 downto 0) = "00") then
+					if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
+						L_T <= "010";
+					else
+						L_T <= "110";
+					end if;
+				elsif (I_SL(4) = '1' and I_INC_4 = '0') then
+					L_ADR  <= I_ADR;
+					L_WR   <= '1';
+					L_ADS  <= '0';
+					L_DATA <= I_DATA;
+					if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
 						L_T <= "010";
 					else
 						L_T <= "110";
@@ -142,18 +152,24 @@ begin
 					L_T   <= "001";
 				end if;
 			elsif (L_T = "001" or L_T = "010") then
-				L_ADS <= '1';
-				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 				if (I_RDY = '0') then
 					if (L_T = "010") then
-						L_DATA <= I_DATA;
-						L_UDR  <= '1';
+						if (L_WR = '1') then
+							L_DATA <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+							L_UDR  <= '1';
+						else
+							L_DATA <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
+							L_UDR  <= '1';
+						end if;
 					else
 						A_INC_4 <= '1';
 						S_D     <= I_DATA;
 						S_W     <= '1';
 					end if;
-					L_T <= "000";
+					L_T   <= "000";
+					L_ADS <= '1';
+					L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+					L_WR  <= '0';
 				end if;
 			elsif (L_T = "110") then
 				L_ADS <= '1';
@@ -189,13 +205,13 @@ begin
 	PC_INC_4 <= I_INC_4;
 
 	with I_SL select Q_DATA <=          --
-		(31 downto 8 => L_DATA(7)) & L_DATA(7 downto 0) when "1000",
-		(31 downto 16 => L_DATA(15)) & L_DATA(15 downto 0) when "1001",
-		L_DATA when "1010",(31 downto 8 => '0') & L_DATA(7 downto 0) when "1100",(31 downto 16 => '0') & L_DATA(15 downto 0) when "1101",
+		(31 downto 8 => L_DATA(7)) & L_DATA(7 downto 0) when "01000",
+		(31 downto 16 => L_DATA(15)) & L_DATA(15 downto 0) when "01001",
+		L_DATA when "01010",(31 downto 8 => '0') & L_DATA(7 downto 0) when "01100",(31 downto 16 => '0') & L_DATA(15 downto 0) when "01101",
 		X"00000000" when others;
 
 	Q_ADS   <= L_ADS;
 	Q_WR    <= L_WR;
-	Q_STALL <= '0' when ((S_AMT = "000" and I_RDIR = '1') or (I_SL(3) = '1' and L_UDR = '0')) else '1';
+	Q_STALL <= '0' when ((S_AMT = "000" and I_RDIR = '1') or ((I_SL(3) = '1' or I_SL(4) = '1') and L_UDR = '0')) else '1';
 	Q_ADR   <= L_ADR;
 end architecture RTL;

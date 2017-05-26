@@ -31,7 +31,7 @@ architecture RTL of csrfile is
 begin
 	process(I_CLK)
 	begin
-		if (rising_edge(I_CLK)) then
+		if (falling_edge(I_CLK)) then
 			CSR_CYCLE <= CSR_CYCLE + X"0000000000000001";
 			CSR_TIME  <= CSR_TIME + X"0000000000000001";
 		end if;
@@ -44,6 +44,10 @@ begin
 		CSR_CYCLE(63 downto 32) when X"C80",
 		CSR_TIME(63 downto 32) when X"C81",
 		CSR_INSTRET(63 downto 32) when X"C82",
+		CSR_MVENDORID when X"F11",
+		CSR_MARCHID when X"F12",
+		CSR_MIMPID when X"F13",
+		CSR_MHARTID when X"F14",
 		NOT_IMPL when others;
 
 	Q_OUT <= L_OUT when I_OE = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";

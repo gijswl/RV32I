@@ -23,7 +23,7 @@ entity random_control_logic is
 		Q_BUSSEL    : out std_logic;
 		Q_CSRBUS    : out std_logic;
 		Q_BUSCSR    : out std_logic;
-		Q_SL        : out std_logic_vector(3 downto 0);
+		Q_SL        : out std_logic_vector(4 downto 0);
 		Q_CYCLE_INC : out std_logic;
 		Q_CYCLE_RST : out std_logic;
 		Q_PC_INC_4  : out std_logic
@@ -71,6 +71,7 @@ begin
 					"01010" when (I_CYCLE(2) = '1' and I_TYPE(24) = '1' and I_FUNC(6) = '1' and I_FUNC(7) = '0') else
 					"01001" when (I_CYCLE(1) = '1' and (I_TYPE(25) = '1' or I_TYPE(27) ='1')) else 
 					"01011" when ((I_CYCLE(3) = '1' and (L_CSR = '1' and I_FUNC(3) = '1')) or (I_CYCLE(4) = '1' and (L_CSRI = '1' and I_FUNC(7) = '1'))) else
+					"01000" when (I_CYCLE(2) = '1' and I_TYPE(24) = '1' and (I_FUNC(6) = '1' or I_FUNC(7) = '1')) else
 					"00000";
 
 	L_REG    <= I_INSTR(24 downto 20) when (I_CYCLE(1) = '1' and (I_TYPE(12) = '1' or I_TYPE(24) = '1')) else 
@@ -84,6 +85,7 @@ begin
 				or (I_CYCLE(3) and (I_TYPE(0) or I_TYPE(12))) 
 				or (I_CYCLE(4) and (L_CSR))
 				or (I_CYCLE(5) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSRI))
+				or (I_CYCLE(0) and I_TYPE(8))
 				or not I_TYPE(32);
 
 	Q_REG       <= L_REG;
@@ -99,7 +101,7 @@ begin
 	Q_BUSSEL    <= ((I_CYCLE(1) and (I_TYPE(24) or I_TYPE(12))) or (I_CYCLE(2) and (I_TYPE(0))) or (I_CYCLE(0) and (L_CSR or L_CSRI)));
 	Q_CSRBUS    <= (I_CYCLE(0) and (L_CSR or L_CSRI));
 	Q_BUSCSR    <= (I_CYCLE(4) and (L_CSR)) or (I_CYCLE(5) and L_CSRI);
-	Q_SL        <= (I_CYCLE(2) and I_TYPE(0)) & I_INSTR(14 downto 12);
+	Q_SL        <= (I_CYCLE(2) and I_TYPE(8)) & (I_CYCLE(2) and I_TYPE(0)) & I_INSTR(14 downto 12);
 	Q_CYCLE_INC <= '1';
 	Q_CYCLE_RST <= L_RST;
 	Q_PC_INC_4  <= L_RST and I_TYPE(32);

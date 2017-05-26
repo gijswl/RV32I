@@ -22,7 +22,7 @@ entity control_unit is
 		Q_BUSPC    : out std_logic;
 		Q_CSRBUS   : out std_logic;
 		Q_BUSCSR   : out std_logic;
-		Q_SL       : out std_logic_vector(3 downto 0);
+		Q_SL       : out std_logic_vector(4 downto 0);
 		Q_BUSSEL   : out std_logic;
 		Q_PC_INC_4 : out std_logic
 	);
@@ -86,7 +86,7 @@ architecture RTL of control_unit is
 			Q_BUSSEL    : out std_logic;
 			Q_CSRBUS    : out std_logic;
 			Q_BUSCSR    : out std_logic;
-			Q_SL        : out std_logic_vector(3 downto 0);
+			Q_SL        : out std_logic_vector(4 downto 0);
 			Q_CYCLE_INC : out std_logic;
 			Q_CYCLE_RST : out std_logic;
 			Q_PC_INC_4  : out std_logic
@@ -95,7 +95,7 @@ architecture RTL of control_unit is
 
 	signal R_REG    : std_logic_vector(4 downto 0) := "00000";
 	signal R_ALUFC  : std_logic_vector(4 downto 0) := "00000";
-	signal R_SL     : std_logic_vector(3 downto 0) := "0000";
+	signal R_SL     : std_logic_vector(4 downto 0) := "00000";
 	signal R_IMMOUT : std_logic                    := '0';
 	signal R_LOCKA  : std_logic                    := '0';
 	signal R_LOCKB  : std_logic                    := '0';

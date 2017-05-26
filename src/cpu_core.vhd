@@ -34,7 +34,7 @@ architecture RTL of cpu_core is
 			Q_BUSPC    : out std_logic;
 			Q_CSRBUS   : out std_logic;
 			Q_BUSCSR   : out std_logic;
-			Q_SL       : out std_logic_vector(3 downto 0);
+			Q_SL       : out std_logic_vector(4 downto 0);
 			Q_BUSSEL   : out std_logic;
 			Q_PC_INC_4 : out std_logic
 		);
@@ -43,7 +43,7 @@ architecture RTL of cpu_core is
 	signal C_IMM    : std_logic_vector(31 downto 0) := X"00000000";
 	signal C_ALUFC  : std_logic_vector(4 downto 0)  := "00000";
 	signal C_REG    : std_logic_vector(4 downto 0)  := "00000";
-	signal C_SL     : std_logic_vector(3 downto 0)  := "0000";
+	signal C_SL     : std_logic_vector(4 downto 0)  := "00000";
 	signal C_LOCKA  : std_logic                     := '0';
 	signal C_LOCKB  : std_logic                     := '0';
 	signal C_LOCKC  : std_logic                     := '0';
@@ -65,7 +65,7 @@ architecture RTL of cpu_core is
 			I_LDPC  : in  std_logic;
 			I_RDIR  : in  std_logic;
 			I_RDY   : in  std_logic;
-			I_SL    : in  std_logic_vector(3 downto 0);
+			I_SL    : in  std_logic_vector(4 downto 0);
 			I_PC    : in  std_logic_vector(31 downto 0);
 			I_DATA  : in  std_logic_vector(31 downto 0);
 			I_ADR   : in  std_logic_vector(31 downto 0);
@@ -79,6 +79,7 @@ architecture RTL of cpu_core is
 		);
 	end component ifetch_unit;
 
+	signal F_WR   : std_logic;
 	signal F_PC   : std_logic_vector(31 downto 0) := X"00000000";
 	signal F_DATA : std_logic_vector(31 downto 0) := X"00000000";
 
@@ -196,7 +197,7 @@ begin
 			I_PC    => F_PC,
 			I_DATA  => I_RDT,
 			I_ADR   => R_CO,
-			Q_WR    => Q_WR,
+			Q_WR    => F_WR,
 			Q_STALL => C_STALL,
 			Q_ADR   => Q_ADR,
 			Q_IR    => R_IR,
@@ -253,4 +254,7 @@ begin
 	L_BUSC <= F_DATA when C_BUSSEL = '1' else R_CO;
 
 	F_PC <= L_BUSC when C_BUSPC = '1';
+
+	Q_WDT <= F_DATA when F_WR = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+	Q_WR  <= F_WR;
 end architecture RTL;
