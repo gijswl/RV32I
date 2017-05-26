@@ -245,7 +245,10 @@ begin
 			Q_O   => R_CI
 		);
 
-	L_BUSA <= R_PC when C_PCBUS = '1' else R_OUT when C_BUSSEL = '0' else S_OUT when C_BUSSEL = '1';
+	L_BUSA <= R_PC when C_PCBUS = '1'
+		else R_OUT when C_BUSSEL = '0'
+		else S_OUT when C_BUSSEL = '1'
+	;
 	L_BUSB <= R_OUT when C_BUSSEL = '1' else C_IMM;
 	L_BUSC <= F_DATA when C_BUSSEL = '1' else R_CO;
 

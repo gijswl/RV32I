@@ -172,7 +172,7 @@ begin
 		((11 downto 0 => I_INSTR(31)) & I_INSTR(19 downto 12) & I_INSTR(20) & I_INSTR(31 downto 25) & I_INSTR(24 downto 21)) when "100000",
 		X"00000000" when others;
 
-	Q_IMM    <= L_IMM when R_IMMOUT = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+	Q_IMM    <= ((26 downto 0 => '0') & I_INSTR(19 downto 15)) when (D_TYPE(28) = '1' and (D_FUNC(5) = '1' or D_FUNC(6) = '1' or D_FUNC(7) = '1') and C_CYCLE(1) = '1' and R_IMMOUT = '1') else L_IMM when R_IMMOUT = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 	Q_REG    <= R_REG;
 	Q_ALUFC  <= R_ALUFC;
 	Q_LOCKA  <= R_LOCKA;

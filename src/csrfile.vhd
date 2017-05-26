@@ -15,14 +15,14 @@ entity csrfile is
 end entity csrfile;
 
 architecture RTL of csrfile is
-	constant NOT_IMPL : std_logic_vector(31 downto 0) := X"00000000";
-	--	constant CSR_MVENDORID : std_logic_vector(31 downto 0) := X"00000000";
-	--	constant CSR_MARCHID   : std_logic_vector(31 downto 0) := X"00000000";
-	--	constant CSR_MIMPID    : std_logic_vector(31 downto 0) := X"00000000";
-	--	constant CSR_MHARTID   : std_logic_vector(31 downto 0) := X"00000000";
+	constant NOT_IMPL      : std_logic_vector(31 downto 0) := X"00000000";
+	constant CSR_MVENDORID : std_logic_vector(31 downto 0) := X"00000000";
+	constant CSR_MARCHID   : std_logic_vector(31 downto 0) := X"00000000";
+	constant CSR_MIMPID    : std_logic_vector(31 downto 0) := X"00000000";
+	constant CSR_MHARTID   : std_logic_vector(31 downto 0) := X"00000000";
 	--
-	--	signal CSR_MISA    : std_logic_vector(31 downto 0) := X"40000100";
-	--	signal CSR_MSTATUS : std_logic_vector(31 downto 0);
+	-- signal CSR_MISA    : std_logic_vector(31 downto 0) := X"40000100";
+	-- signal CSR_MSTATUS : std_logic_vector(31 downto 0);
 
 	signal CSR_CYCLE   : std_logic_vector(63 downto 0) := X"0000000000000000";
 	signal CSR_TIME    : std_logic_vector(63 downto 0) := X"0000000000000000";
@@ -46,5 +46,5 @@ begin
 		CSR_INSTRET(63 downto 32) when X"C82",
 		NOT_IMPL when others;
 
-	Q_OUT <= L_OUT when I_OE = '1';
+	Q_OUT <= L_OUT when I_OE = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 end architecture RTL;
