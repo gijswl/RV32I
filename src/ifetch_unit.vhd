@@ -26,6 +26,7 @@ end entity ifetch_unit;
 
 architecture RTL of ifetch_unit is
 	constant DEFAULT_RSTVEC : std_logic_vector(31 downto 0) := X"00001000";
+	constant HI_Z32         : std_logic_vector(31 downto 0) := "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
 
 	component shift_reg64 is
 		port(
@@ -75,13 +76,15 @@ architecture RTL of ifetch_unit is
 	signal A_INC_4 : std_logic                     := '0';
 	signal A_AR    : std_logic_vector(31 downto 0) := X"00000000";
 
-	signal L_T    : std_logic_vector(2 downto 0)  := "000";
-	signal L_WR   : std_logic                     := '0';
-	signal L_UDR  : std_logic                     := '0';
-	signal L_ADS  : std_logic                     := '1';
-	signal L_ADR  : std_logic_vector(31 downto 0) := X"00000000";
-	signal L_DATA : std_logic_vector(31 downto 0) := X"00000000";
-	signal L_DAT  : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_T     : std_logic_vector(3 downto 0)  := "0000";
+	signal L_WR    : std_logic                     := '0';
+	signal L_UDR   : std_logic                     := '0';
+	signal L_ADS   : std_logic                     := '1';
+	signal L_ADR   : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_DATA1 : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_DATA2 : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_RDAT  : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_WDAT  : std_logic_vector(31 downto 0) := X"00000000";
 begin
 	ir : shift_reg64
 		port map(
@@ -119,84 +122,278 @@ begin
 
 	process(I_CLK)
 	begin
+		-- if (falling_edge(I_CLK)) then
+		-- if (L_T = "000") then
+		-- L_DATA  <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		-- L_UDR   <= '0';
+		-- S_D     <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		-- S_W     <= '0';
+		-- A_INC_4 <= '0';
+		-- if (I_SL(3) = '1' and I_INC_4 = '0') then
+		-- L_ADR <= I_ADR;
+		-- L_WR  <= '0';
+		-- L_ADS <= '0';
+		-- if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
+		-- L_T <= "010";
+		-- else
+		-- L_T <= "110";
+		-- end if;
+		-- elsif (I_SL(4) = '1' and I_INC_4 = '0') then
+		-- L_ADR <= I_ADR;
+		-- L_WR   <= '1';
+		-- L_ADS  <= '0';
+		-- L_DATA <= I_DATA;
+		-- if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
+		-- L_T <= "010";
+		-- else
+		-- L_T <= "110";
+		-- end if;
+		-- elsif ((S_AMT = "000" or S_AMT = "001" or S_AMT = "010") and not S_W = '1') then
+		-- L_ADR <= A_AR;
+		-- L_WR  <= '0';
+		-- L_ADS <= '0';
+		-- L_T   <= "001";
+		-- end if;
+		-- elsif (L_T = "001" or L_T = "010") then
+		-- if (I_RDY = '0') then
+		-- if (L_T = "010") then
+		-- if (L_WR = '1') then
+		-- L_DATA <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		-- L_UDR  <= '1';
+		-- else
+		-- L_DATA <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
+		-- L_UDR  <= '1';
+		-- end if;
+		-- else
+		-- A_INC_4 <= '1';
+		-- S_D     <= I_DATA;
+		-- S_W     <= '1';
+		-- end if;
+		-- L_T   <= "000";
+		-- L_ADS <= '1';
+		-- L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		-- L_WR  <= '0';
+		-- end if;
+		-- elsif (L_T = "110") then
+		-- L_ADS <= '1';
+		-- L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		-- if (I_RDY = '0') then
+		-- L_DAT <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
+		--
+		-- L_ADR <= I_ADR + "100";
+		-- L_WR  <= '0';
+		-- L_ADS <= '0';
+		-- L_T   <= "111";
+		-- end if;
+		-- elsif (L_T = "111") then
+		-- L_ADS <= '1';
+		-- L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+		--
+		-- if (I_RDY = '0') then
+		-- if (I_ADR(1 downto 0) = "01") then
+		-- L_DATA <= L_DAT or SHL(I_DATA, "11000");
+		-- elsif (I_ADR(1 downto 0) = "10") then
+		-- L_DATA <= L_DAT or SHL(I_DATA, "10000");
+		-- elsif (I_ADR(1 downto 0) = "11") then
+		-- L_DATA <= L_DAT or SHL(I_DATA, "01000");
+		-- end if;
+		-- L_UDR <= '1';
+		-- L_T   <= "000";
+		-- end if;
+		-- end if;
+		-- end if;
+
 		if (falling_edge(I_CLK)) then
-			if (L_T = "000") then
-				L_DATA  <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-				L_UDR   <= '0';
-				S_D     <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-				S_W     <= '0';
+			if (L_T = "0000") then      -- idle state
 				A_INC_4 <= '0';
+
+				S_W <= '0';
+				S_D <= HI_Z32;
+
+				L_UDR   <= '0';
+				L_DATA1 <= HI_Z32;
+				L_DATA2 <= HI_Z32;
+				L_WR    <= '0';
+
 				if (I_SL(3) = '1' and I_INC_4 = '0') then
-					L_ADR <= I_ADR;
-					L_WR  <= '0';
+					L_ADR <= I_ADR(31 downto 0);
 					L_ADS <= '0';
 					if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
-						L_T <= "010";
+						L_T <= "0010";
 					else
-						L_T <= "110";
+						L_T <= "0101";
 					end if;
 				elsif (I_SL(4) = '1' and I_INC_4 = '0') then
-					L_ADR  <= I_ADR;
-					L_WR   <= '1';
-					L_ADS  <= '0';
-					L_DATA <= I_DATA;
-					if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
-						L_T <= "010";
-					else
-						L_T <= "110";
-					end if;
+					L_DATA1 <= I_DATA;
+					L_T     <= "0011";
 				elsif ((S_AMT = "000" or S_AMT = "001" or S_AMT = "010") and not S_W = '1') then
 					L_ADR <= A_AR;
-					L_WR  <= '0';
 					L_ADS <= '0';
-					L_T   <= "001";
+					L_T   <= "0001";
 				end if;
-			elsif (L_T = "001" or L_T = "010") then
+			elsif (L_T = "0001") then   -- fetch 2
 				if (I_RDY = '0') then
-					if (L_T = "010") then
-						if (L_WR = '1') then
-							L_DATA <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-							L_UDR  <= '1';
-						else
-							L_DATA <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
-							L_UDR  <= '1';
-						end if;
-					else
-						A_INC_4 <= '1';
-						S_D     <= I_DATA;
-						S_W     <= '1';
-					end if;
-					L_T   <= "000";
+					A_INC_4 <= '1';
+					S_W     <= '1';
+					S_D     <= I_DATA;
+
 					L_ADS <= '1';
-					L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-					L_WR  <= '0';
+					L_ADR <= HI_Z32;
+					L_T   <= "0000";
 				end if;
-			elsif (L_T = "110") then
-				L_ADS <= '1';
-				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
+			elsif (L_T = "0010") then   -- load 2
 				if (I_RDY = '0') then
-					L_DAT <= SHR(I_DATA, I_ADR(1 downto 0) & "000");
+					L_DATA2 <= std_logic_vector(unsigned(I_DATA) srl to_integer(unsigned(I_ADR(1 downto 0) & "000")));
+					L_UDR   <= '1';
 
-					L_ADR <= I_ADR + "100";
-					L_WR  <= '0';
-					L_ADS <= '0';
-					L_T   <= "111";
+					L_ADS <= '1';
+					L_ADR <= HI_Z32;
+					L_T   <= "0000";
 				end if;
-			elsif (L_T = "111") then
-				L_ADS <= '1';
-				L_ADR <= "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-
-				if (I_RDY = '0') then
-					if (I_ADR(1 downto 0) = "01") then
-						L_DATA <= L_DAT or SHL(I_DATA, "11000");
-					elsif (I_ADR(1 downto 0) = "10") then
-						L_DATA <= L_DAT or SHL(I_DATA, "10000");
-					elsif (I_ADR(1 downto 0) = "11") then
-						L_DATA <= L_DAT or SHL(I_DATA, "01000");
+			elsif (L_T = "0011") then   -- store 2
+				if (I_SL(4) = '1') then
+					L_ADR <= I_ADR;
+					if (I_ADR(1 downto 0) = "00" or (I_ADR(1 downto 0) = "10" and (I_SL(2 downto 0) = "001" or I_SL(2 downto 0) = "000")) or ((I_ADR(1 downto 0) = "01" or I_ADR(1 downto 0) = "11") and I_SL(2 downto 0) = "000")) then
+						case I_ADR(1 downto 0) is
+							when "00"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT <= (31 downto 8 => L_DATA1(7)) & L_DATA1(7 downto 0);
+									when "001" => L_WDAT <= (31 downto 16 => L_DATA1(15)) & L_DATA1(15 downto 0);
+									when "010" => L_WDAT <= L_DATA1;
+									when "100" => L_WDAT <= (31 downto 8 => '0') & L_DATA1(7 downto 0);
+									when "101" => L_WDAT <= (31 downto 16 => '0') & L_DATA1(15 downto 0);
+									when others => L_WDAT <= HI_Z32;
+										report "invalid SL" severity note;
+									end case;
+							when "01"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT <= (23 downto 8 => L_DATA1(7)) & L_DATA1(7 downto 0) & X"00";
+									when "001" => L_WDAT <= (23 downto 16 => L_DATA1(15)) & L_DATA1(15 downto 0) & X"00";
+									when "010" => L_WDAT <= L_DATA1(23 downto 0) & X"00";
+									when "100" => L_WDAT <= (23 downto 8 => '0') & L_DATA1(7 downto 0) & X"00";
+									when "101" => L_WDAT <= (23 downto 16 => '0') & L_DATA1(15 downto 0) & X"00";
+									when others => L_WDAT <= HI_Z32;
+										report "invalid SL" severity note;
+									end case;
+							when "10"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT <= (15 downto 8 => L_DATA1(7)) & L_DATA1(7 downto 0) & X"0000";
+									when "001" => L_WDAT <= L_DATA1(15 downto 0) & X"0000";
+									when "010" => L_WDAT <= L_DATA1(15 downto 0) & X"0000";
+									when "100" => L_WDAT <= (15 downto 8 => '0') & L_DATA1(7 downto 0) & X"0000";
+									when "101" => L_WDAT <= L_DATA1(15 downto 0) & X"0000";
+									when others => L_WDAT <= HI_Z32;
+										report "invalid SL" severity note;
+									end case;
+							when "11"   => L_WDAT <= L_DATA1(7 downto 0) & X"000000";
+							when others => L_WDAT <= HI_Z32;
+						end case;
+						L_ADS <= '0';
+						L_WR  <= '1';
+						L_T   <= "0100";
+					else
+						case I_ADR(1 downto 0) is
+							when "00"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT  <= (31 downto 8 => I_DATA(7)) & L_DATA1(7 downto 0);
+										L_DATA2 <= X"00000000";
+									when "001" => L_WDAT  <= (31 downto 16 => L_DATA1(15)) & L_DATA1(15 downto 0);
+										L_DATA2 <= X"00000000";
+									when "010" => L_WDAT  <= L_DATA1;
+										L_DATA2 <= X"00000000";
+									when "100" => L_WDAT  <= (31 downto 8 => '0') & L_DATA1(7 downto 0);
+										L_DATA2 <= X"00000000";
+									when "101" => L_WDAT  <= (31 downto 16 => '0') & L_DATA1(15 downto 0);
+										L_DATA2 <= X"00000000";
+									when others => L_WDAT  <= HI_Z32;
+										L_DATA2 <= HI_Z32;
+										report "invalid SL" severity note;
+									end case;
+							when "01"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT  <= (23 downto 8 => L_DATA1(7)) & L_DATA1(7 downto 0) & X"00";
+										L_DATA2 <= X"000000" & (7 downto 0 => L_DATA1(7));
+									when "001" => L_WDAT  <= (23 downto 16 => L_DATA1(15)) & L_DATA1(15 downto 0) & X"00";
+										L_DATA2 <= X"000000" & (7 downto 0 => L_DATA1(15));
+									when "010" => L_WDAT  <= L_DATA1(23 downto 0) & X"00";
+										L_DATA2 <= X"000000" & L_DATA1(31 downto 24);
+									when "100" => L_WDAT  <= (23 downto 8 => '0') & L_DATA1(7 downto 0) & X"00";
+										L_DATA2 <= X"00000000";
+									when "101" => L_WDAT  <= (23 downto 16 => '0') & L_DATA1(15 downto 0) & X"00";
+										L_DATA2 <= X"00000000";
+									when others => L_WDAT  <= HI_Z32;
+										L_DATA2 <= HI_Z32;
+										report "invalid SL" severity note;
+							end case;
+							when "10"   => case I_SL(2 downto 0) is
+									when "000" => L_WDAT  <= (15 downto 8 => L_DATA1(7)) & L_DATA1(7 downto 0) & X"0000";
+										L_DATA2 <= X"0000" & (15 downto 0 => L_DATA1(7));
+									when "001" => L_WDAT  <= L_DATA1(15 downto 0) & X"0000";
+										L_DATA2 <= X"0000" & (15 downto 0 => L_DATA1(15));
+									when "010" => L_WDAT  <= L_DATA1(15 downto 0) & X"0000";
+										L_DATA2 <= X"0000" & L_DATA1(31 downto 16);
+									when "100" => L_WDAT  <= (15 downto 8 => '0') & L_DATA1(7 downto 0) & X"0000";
+										L_DATA2 <= X"00000000";
+									when "101" => L_WDAT  <= L_DATA1(15 downto 0) & X"0000";
+										L_DATA2 <= X"00000000";
+									when others => L_WDAT  <= HI_Z32;
+										L_DATA2 <= HI_Z32;
+										report "invalid SL" severity note;
+								end case;
+							when "11"   => L_WDAT <= L_DATA1(7 downto 0) & X"000000"; -- TODO
+							when others => L_WDAT <= HI_Z32;
+						end case;
+						L_ADS <= '0';
+						L_WR  <= '1';
+						L_T   <= "0111";
 					end if;
-					L_UDR <= '1';
-					L_T   <= "000";
 				end if;
+			elsif (L_T = "0100") then   -- store 3
+				if (I_RDY = '0') then
+					L_ADR <= HI_Z32;
+					L_ADS <= '1';
+					L_UDR <= '1';
+					L_WR  <= '0';
+					L_T   <= "0000";
+				end if;
+			elsif (L_T = "0101") then   -- mload 2
+				if (I_RDY = '0') then
+					L_DATA1 <= std_logic_vector(unsigned(I_DATA) srl to_integer(unsigned(L_ADR(1 downto 0) & "000")));
+					L_UDR   <= '0';
+
+					L_ADS <= '0';
+					L_ADR <= L_ADR + "100";
+					L_T   <= "0110";
+				end if;
+			elsif (L_T = "0110") then   -- mload 3
+				if (I_RDY = '0') then
+					case L_ADR(1 downto 0) is
+						when "01" => L_DATA2 <= L_DATA1 or (I_DATA(7 downto 0) & X"000000");
+						when "10" => L_DATA2 <= L_DATA1 or (I_DATA(15 downto 0) & X"0000");
+						when "11" => L_DATA2 <= L_DATA1 or (I_DATA(24 downto 0) & X"00");
+						when others => L_DATA2 <= L_DATA1;
+							report "invalid displacement" severity note;
+					end case;
+					L_ADS <= '1';
+					L_ADR <= HI_Z32;
+					L_UDR <= '1';
+					L_T   <= "0000";
+				end if;
+			elsif (L_T = "0111") then   -- mstore 2
+				if (I_RDY = '0') then
+					L_WDAT <= L_DATA2;
+					L_ADR  <= L_ADR + "100";
+					L_ADS  <= '0';
+					L_UDR  <= '0';
+					L_WR   <= '1';
+					L_T    <= "1000";
+				end if;
+			elsif (L_T = "1000") then   -- mstore 3
+				if (I_RDY = '0') then
+					L_WDAT <= HI_Z32;
+					L_ADR  <= HI_Z32;
+					L_ADS  <= '1';
+					L_UDR  <= '1';
+					L_WR   <= '0';
+					L_T    <= "0000";
+				end if;
+			else
+				report "Invalid IFU state" severity failure;
 			end if;
 		end if;
 	end process;
@@ -204,14 +401,20 @@ begin
 	S_SH1    <= '1' when (not (S_AMT = "000") and I_RDIR = '1') else '0';
 	PC_INC_4 <= I_INC_4;
 
-	with I_SL select Q_DATA <=          --
-		(31 downto 8 => L_DATA(7)) & L_DATA(7 downto 0) when "01000",
-		(31 downto 16 => L_DATA(15)) & L_DATA(15 downto 0) when "01001",
-		L_DATA when "01010",(31 downto 8 => '0') & L_DATA(7 downto 0) when "01100",(31 downto 16 => '0') & L_DATA(15 downto 0) when "01101",
+	with I_SL select L_RDAT <=          --
+		(31 downto 8 => L_DATA1(7)) & L_DATA2(7 downto 0) when "01000", --
+		(31 downto 16 => L_DATA1(15)) & L_DATA2(15 downto 0) when "01001", --
+		L_DATA2 when "01010",           --
+		(31 downto 8 => '0') & L_DATA2(7 downto 0) when "01100", --
+		(31 downto 16 => '0') & L_DATA2(15 downto 0) when "01101", --
 		X"00000000" when others;
+
+	Q_DATA <= L_RDAT when I_SL(3) = '1'
+		else L_WDAT when I_SL(4) = '1'
+		else HI_Z32;
 
 	Q_ADS   <= L_ADS;
 	Q_WR    <= L_WR;
-	Q_STALL <= '0' when ((S_AMT = "000" and I_RDIR = '1') or ((I_SL(3) = '1' or I_SL(4) = '1') and L_UDR = '0')) else '1';
+	Q_STALL <= '0' when ((S_AMT = "000" and I_RDIR = '1') or ((I_SL(3) = '1' or L_WR = '1') and L_UDR = '0')) else '1';
 	Q_ADR   <= L_ADR;
 end architecture RTL;

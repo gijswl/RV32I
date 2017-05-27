@@ -82,6 +82,7 @@ architecture RTL of cpu_core is
 	signal F_WR   : std_logic;
 	signal F_PC   : std_logic_vector(31 downto 0) := X"00000000";
 	signal F_DATA : std_logic_vector(31 downto 0) := X"00000000";
+	signal L_DATA : std_logic_vector(31 downto 0) := X"00000000";
 
 	component registerfile is
 		port(
@@ -195,8 +196,8 @@ begin
 			I_RDIR  => C_RDIR,
 			I_SL    => C_SL,
 			I_PC    => F_PC,
-			I_DATA  => I_RDT,
-			I_ADR   => R_CO,
+			I_DATA  => L_DATA,
+			I_ADR   => R_CI,
 			Q_WR    => F_WR,
 			Q_STALL => C_STALL,
 			Q_ADR   => Q_ADR,
@@ -253,6 +254,7 @@ begin
 	L_BUSB <= R_OUT when C_BUSSEL = '1' else C_IMM;
 	L_BUSC <= F_DATA when C_BUSSEL = '1' else R_CO;
 
+	L_DATA <= I_RDT when C_SL(4) = '0' else L_BUSC;
 	F_PC <= L_BUSC when C_BUSPC = '1';
 
 	Q_WDT <= F_DATA when F_WR = '1' else "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";

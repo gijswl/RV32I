@@ -65,7 +65,7 @@ begin
 		"10010" when "100100000",
 		"00000" when others;
 	L_INST_ALU <= "00001" when ((I_CYCLE(1) = '1' and I_TYPE(13) = '1') or (I_CYCLE(3) = '1' and (L_CSR = '1' and I_FUNC(1) = '1')) or (I_CYCLE(4) = '1' and (L_CSRI = '1' and I_FUNC(5) = '1'))) else 
-					"00010" when ((I_CYCLE(1) = '1' and (I_TYPE(0) = '1' or I_TYPE(5) = '1')) or (I_CYCLE(4) = '1' and (I_TYPE(24) = '1' or I_TYPE(25) = '1' or I_TYPE(27) = '1'))) else 
+					"00010" when ((I_CYCLE(1) = '1' and (I_TYPE(0) = '1' or I_TYPE(5) = '1')) or (I_CYCLE(4) = '1' and (I_TYPE(8) = '1' or I_TYPE(24) = '1' or I_TYPE(25) = '1' or I_TYPE(27) = '1'))) else 
 					"00011" when (I_CYCLE(2) = '1' and I_TYPE(24) = '1' and I_FUNC(6) = '0' and I_FUNC(7) = '0') else
 					"00101" when ((I_CYCLE(3) = '1' and (L_CSR = '1' and I_FUNC(2) = '1')) or (I_CYCLE(4) = '1' and (L_CSRI = '1' and I_FUNC(6) = '1'))) else
 					"01010" when (I_CYCLE(2) = '1' and I_TYPE(24) = '1' and I_FUNC(6) = '1' and I_FUNC(7) = '0') else
@@ -74,8 +74,9 @@ begin
 					"01000" when (I_CYCLE(2) = '1' and I_TYPE(24) = '1' and (I_FUNC(6) = '1' or I_FUNC(7) = '1')) else
 					"00000";
 
-	L_REG    <= I_INSTR(24 downto 20) when (I_CYCLE(1) = '1' and (I_TYPE(12) = '1' or I_TYPE(24) = '1')) else 
-				I_INSTR(19 downto 15) when ((I_CYCLE(3) = '1' and I_TYPE(25) = '1') 
+	L_REG    <= I_INSTR(24 downto 20) when ((I_CYCLE(1) = '1' and (I_TYPE(12) = '1' or I_TYPE(24) = '1')) 
+										or (I_CYCLE(0) = '1' and I_TYPE(8) = '1')) else 
+				I_INSTR(19 downto 15) when ((I_CYCLE(3) = '1' and (I_TYPE(25) = '1' or I_TYPE(8) = '1')) 
 										or (I_CYCLE(0) = '1' and (I_TYPE(0) = '1' or I_TYPE(4) = '1' or I_TYPE(12) = '1' or I_TYPE(24) = '1' or L_CSR = '1'))) else 
 				I_INSTR(11 downto 7) when ((I_CYCLE(3) = '1' and (I_TYPE(5) = '1' or I_TYPE(12) = '1' or L_CSRI = '1')) 
 										or (I_CYCLE(2) = '1' and (I_TYPE(0) = '1' or I_TYPE(4) = '1' or I_TYPE(5) = '1' or I_TYPE(13) = '1' or I_TYPE(25) = '1' or I_TYPE(27) = '1' or L_CSR = '1'))) 
@@ -85,23 +86,23 @@ begin
 				or (I_CYCLE(3) and (I_TYPE(0) or I_TYPE(12))) 
 				or (I_CYCLE(4) and (L_CSR))
 				or (I_CYCLE(5) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSRI))
-				or (I_CYCLE(0) and I_TYPE(8))
+				or (I_CYCLE(6) and I_TYPE(8))
 				or not I_TYPE(32);
 
 	Q_REG       <= L_REG;
 	Q_ALUFC     <= L_FUNC_ALU when L_ALUSEL = '1' else L_INST_ALU;
-	Q_IMMOUT    <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or L_CSR or L_CSRI)) or (I_CYCLE(1) and L_CSRI) or (I_CYCLE(3) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27))) or (I_CYCLE(4) and (L_CSR)) or (I_CYCLE(5) and L_CSRI);
-	Q_LOCKA     <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(12) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSR or L_CSRI)) or (I_CYCLE(3) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27)));
-	Q_LOCKB     <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or L_CSR)) or (I_CYCLE(1) and (I_TYPE(12) or I_TYPE(24) or L_CSRI)) or (I_CYCLE(3) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27)));
-	Q_LOCKC     <= (I_CYCLE(1) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or I_TYPE(25) or I_TYPE(27) or L_CSR)) or (I_CYCLE(2) and (I_TYPE(12) or L_CSRI)) or (I_CYCLE(3) and (L_CSR)) or (I_CYCLE(4) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSRI));
-	Q_RBUS      <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(12) or I_TYPE(24) or L_CSR)) or (I_CYCLE(1) and (I_TYPE(12) or I_TYPE(24))) or (I_CYCLE(3) and I_TYPE(25));
+	Q_IMMOUT    <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or L_CSR or L_CSRI)) or (I_CYCLE(1) and L_CSRI) or (I_CYCLE(3) and (I_TYPE(8) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27))) or (I_CYCLE(4) and (L_CSR)) or (I_CYCLE(5) and L_CSRI);
+	Q_LOCKA     <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(8) or I_TYPE(12) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSR or L_CSRI)) or (I_CYCLE(3) and (I_TYPE(8) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27)));
+	Q_LOCKB     <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or L_CSR)) or (I_CYCLE(1) and (I_TYPE(12) or I_TYPE(24) or L_CSRI)) or (I_CYCLE(3) and (I_TYPE(8) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27)));
+	Q_LOCKC     <= (I_CYCLE(1) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(8) or I_TYPE(13) or I_TYPE(25) or I_TYPE(27) or L_CSR)) or (I_CYCLE(2) and (I_TYPE(12) or L_CSRI)) or (I_CYCLE(3) and (L_CSR)) or (I_CYCLE(4) and (I_TYPE(8) or I_TYPE(24) or I_TYPE(25) or I_TYPE(27) or L_CSRI));
+	Q_RBUS      <= (I_CYCLE(0) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(8) or I_TYPE(12) or I_TYPE(24) or L_CSR)) or (I_CYCLE(1) and (I_TYPE(12) or I_TYPE(24))) or (I_CYCLE(3) and (I_TYPE(8) or I_TYPE(25)));
 	Q_BUSR      <= (I_CYCLE(2) and (I_TYPE(0) or I_TYPE(4) or I_TYPE(5) or I_TYPE(13) or I_TYPE(25) or I_TYPE(27) or L_CSR)) or (I_CYCLE(3) and (I_TYPE(0) or I_TYPE(12) or L_CSRI));
 	Q_PCBUS     <= (I_CYCLE(0) and (I_TYPE(5) or I_TYPE(25) or I_TYPE(27))) or (I_CYCLE(3) and (I_TYPE(24) or I_TYPE(27)));
 	Q_BUSPC     <= I_CYCLE(5) and (I_TYPE(24) or I_TYPE(25) or I_TYPE(27));
 	Q_BUSSEL    <= ((I_CYCLE(1) and (I_TYPE(24) or I_TYPE(12))) or (I_CYCLE(2) and (I_TYPE(0))) or (I_CYCLE(0) and (L_CSR or L_CSRI)));
 	Q_CSRBUS    <= (I_CYCLE(0) and (L_CSR or L_CSRI));
 	Q_BUSCSR    <= (I_CYCLE(4) and (L_CSR)) or (I_CYCLE(5) and L_CSRI);
-	Q_SL        <= (I_CYCLE(2) and I_TYPE(8)) & (I_CYCLE(2) and I_TYPE(0)) & I_INSTR(14 downto 12);
+	Q_SL        <= ((I_CYCLE(2) or I_CYCLE(5)) and I_TYPE(8)) & (I_CYCLE(2) and I_TYPE(0)) & I_INSTR(14 downto 12);
 	Q_CYCLE_INC <= '1';
 	Q_CYCLE_RST <= L_RST;
 	Q_PC_INC_4  <= L_RST and I_TYPE(32);
