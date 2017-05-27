@@ -130,8 +130,8 @@ begin
 				S_D <= HI_Z32;
 
 				L_UDR   <= '0';
-				L_DATA1 <= HI_Z32;
-				L_DATA2 <= HI_Z32;
+				L_DATA1 <= X"00000000";
+				L_DATA2 <= X"00000000";
 				L_WR    <= '0';
 
 				if (I_SL(3) = '1' and I_INC_4 = '0') then
@@ -290,8 +290,8 @@ begin
 	PC_INC_4 <= I_INC_4;
 
 	with I_SL select L_RDAT <=          --
-		(31 downto 8 => L_DATA1(7)) & L_DATA2(7 downto 0) when "01000", --
-		(31 downto 16 => L_DATA1(15)) & L_DATA2(15 downto 0) when "01001", --
+		(31 downto 8 => L_DATA2(7)) & L_DATA2(7 downto 0) when "01000", --
+		(31 downto 16 => L_DATA2(15)) & L_DATA2(15 downto 0) when "01001", --
 		L_DATA2 when "01010",           --
 		(31 downto 8 => '0') & L_DATA2(7 downto 0) when "01100", --
 		(31 downto 16 => '0') & L_DATA2(15 downto 0) when "01101", --
